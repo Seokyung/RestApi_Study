@@ -1,11 +1,17 @@
 import express from "express";
 import * as argon2 from "argon2";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+
+import { userValidator } from "../middleware/auth.js";
+
 import { text_data } from "./text_data.js";
 import { users_data } from "./users_data.js";
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 /*** 데이터 CRUD ***/
@@ -62,6 +68,11 @@ app.get("/users", (req, res) => {
 	res.send(users_data);
 });
 
+// GET - 인증된 user인지 검증 (auth)
+app.get("/secure_data", userValidator, (req, res) => {
+	res.send("인증된 사용자입니다.");
+});
+
 // POST - users에 유저 정보 추가 (signup)
 app.post("/signup", async (req, res) => {
 	const { userId, password, userName, age, email } = req.body;
@@ -97,6 +108,8 @@ app.post("/login", async (req, res) => {
 
 		if (await argon2.verify(user[0].password, password)) {
 			// password match
+			const access_token = jwt.sign({ userId }, "secure");
+			res.cookie("access_token", access_token, { httpOnly: true }); //쿠키를 이용해 클라이언트에 jwt를 넘겨주는 방법
 			res.send("POST - login 성공!");
 		} else {
 			// password did not match
