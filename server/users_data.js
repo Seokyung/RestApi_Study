@@ -12,7 +12,7 @@ export const users_data = [
 		userId: "scrrrr2",
 		password: "tpircs2sj",
 		userName: "박스크립트",
-		age: 21,
+		age: 43,
 		email: "parkjs@aa.bb",
 	},
 ];
