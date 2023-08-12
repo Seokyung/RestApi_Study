@@ -6,9 +6,6 @@ import mysql from "mysql2/promise";
 
 import { userValidator } from "../middleware/auth.js";
 
-import { text_data } from "./text_data.js";
-import { users_data } from "./users_data.js";
-
 const app = express();
 
 app.use(express.json());
@@ -29,20 +26,20 @@ app.get("/", function (req, res) {
 	res.send("Hello World from SK!");
 });
 
-// GET - text_data 전체 조회
+// GET - 데이터베이스(texts) 전체 조회
 app.get("/text", async function (req, res) {
-	// mysql의 데이터베이스(users)의 데이터 조회 (연결된 database의 데이터 받아옴)
-	const [rows, fields] = await connection.execute("SELECT * FROM users");
+	// mysql의 데이터베이스(texts)의 데이터 조회 (연결된 database의 데이터 받아옴)
+	const [rows, fields] = await connection.execute("SELECT * FROM texts");
 	res.send(rows);
 });
 
-// GET - text_data 중 원하는 값 조회
-app.get("/text/:id", async function (req, res) {
-	const id = req.params.id;
-	// mysql의 데이터베이스(users)에서 원하는 데이터 조회
+// GET - 데이터베이스(texts)에서 원하는 값 조회
+app.get("/text/:text_id", async function (req, res) {
+	const text_id = req.params.text_id;
+	// mysql의 데이터베이스(texts)에서 원하는 데이터 조회
 	const [rows, fields] = await connection.execute(
-		"SELECT * FROM users WHERE id=?",
-		[id]
+		"SELECT * FROM texts WHERE text_id=?",
+		[text_id]
 	);
 	if (rows[0]) {
 		res.send(rows[0]);
@@ -51,35 +48,35 @@ app.get("/text/:id", async function (req, res) {
 	}
 });
 
-// POST - text_data 값 추가 (생성)
+// POST - 데이터베이스(texts)에 값 추가 (생성)
 app.post("/text", async function (req, res) {
-	const { name, age } = req.body;
-	// mysql의 데이터베이스(users)에 데이터 추가
-	const [rows, fields] = await connection.execute(
-		`INSERT INTO users(name, age) VALUES(?, ?)`,
-		[name, age] // sql injection 공격을 피하기 위해 인자를 직접 sql문에 쓰지 않음
+	const { text_data } = req.body;
+	// mysql의 데이터베이스(texts)에 데이터 추가
+	await connection.execute(
+		`INSERT INTO texts(text_data) VALUES(?)`,
+		[text_data] // sql injection 공격을 피하기 위해 인자를 직접 sql문에 쓰지 않음
 	);
 	res.send("POST - 값 추가 완료!");
 });
 
-// PUT - text_data 값 수정
+// PUT - 데이터베이스(texts)의 값 수정
 app.put("/text", async function (req, res) {
-	const { id, name, age } = req.body;
-	// mysql의 데이터베이스(users)의 데이터 수정
+	const { text_id, text_data } = req.body;
+	// mysql의 데이터베이스(texts)의 데이터 수정
 	const [rows, fields] = await connection.execute(
-		`UPDATE users SET name=?, age=? WHERE id=?`,
-		[name, age, id]
+		`UPDATE texts SET text_data=? WHERE text_id=?`,
+		[text_data, Number(text_id)]
 	);
 	res.send("PUT - 값 수정 완료!");
 });
 
-// DELETE - text_data 값 삭제
-app.delete("/text/:id", async function (req, res) {
-	const id = req.params.id;
-	// mysql의 데이터베이스(users)의 데이터 삭제
+// DELETE - 데이터베이스(texts)의 값 삭제
+app.delete("/text/:text_id", async function (req, res) {
+	const text_id = req.params.text_id;
+	// mysql의 데이터베이스(texts)의 데이터 삭제
 	const [rows, fields] = await connection.execute(
-		`DELETE from users WHERE id=?`,
-		[id]
+		`DELETE from texts WHERE text_id=?`,
+		[text_id]
 	);
 	res.send("DELETE - 값 삭제 완료!");
 });
@@ -87,8 +84,10 @@ app.delete("/text/:id", async function (req, res) {
 /*** user 인증 ***/
 
 // GET - users 전체 조회
-app.get("/users", (req, res) => {
-	res.send(users_data);
+app.get("/users", async (req, res) => {
+	// mysql의 데이터베이스(users)의 유저 조회
+	const [rows, fields] = await connection.execute("SELECT * FROM users");
+	res.send(rows);
 });
 
 // GET - 인증된 user인지 검증 (auth)
@@ -98,50 +97,52 @@ app.get("/secure_data", userValidator, (req, res) => {
 
 // POST - users에 유저 정보 추가 (signup)
 app.post("/signup", async (req, res) => {
-	const { userId, password, userName, age, email } = req.body;
+	const { user_set_id, user_set_pw, user_name, user_age, user_email } =
+		req.body;
 	try {
-		const hash = await argon2.hash(password); // argon2로 비밀번호 암호화
-		users_data.push({
-			id: users_data.length + 1,
-			userId,
-			password: hash,
-			userName,
-			age,
-			email,
-		});
+		const hash = await argon2.hash(user_set_pw); // argon2로 비밀번호 암호화
+		// mysql의 데이터베이스(users)에 데이터 추가
+		await connection.execute(
+			`INSERT INTO users(user_set_id, user_set_pw, user_name, user_age, user_email) VALUES(?, ?, ?, ?, ?)`,
+			[user_set_id, hash, user_name, user_age, user_email] // sql injection 공격을 피하기 위해 인자를 직접 sql문에 쓰지 않음
+		);
 		res.send("POST - signup 완료!");
 	} catch (err) {
 		res.send("Signup Error", err);
+		// res.status(403).send("Signup Error", err);
 	}
 });
 
 // POST - 유저 로그인 (login)
 app.post("/login", async (req, res) => {
-	const { userId, password } = req.body;
-	const user = users_data.filter((user) => {
-		return user.userId === userId;
-	});
+	const { user_set_id, user_set_pw } = req.body;
+	// mysql의 데이터베이스(users)에서 req로 받아온 유저 아이디가 있는지 조회
+	const [rows, fields] = await connection.execute(
+		"SELECT * FROM users WHERE user_set_id=?",
+		[user_set_id]
+	);
 
 	try {
-		if (user.length === 0) {
-			// id did not match
+		if (!rows[0]) {
+			// id did not match (해당하는 유저 아이디 없음)
 			res.status(403).send("해당하는 아이디가 존재하지 않습니다.");
 			return;
 		}
 
-		if (await argon2.verify(user[0].password, password)) {
+		if (await argon2.verify(rows[0].user_set_pw, user_set_pw)) {
 			// password match
-			const access_token = jwt.sign({ userId }, "secure");
+			const access_token = jwt.sign({ user_set_id }, "secure");
 			res.cookie("access_token", access_token, { httpOnly: true }); //쿠키를 이용해 클라이언트에 jwt를 넘겨주는 방법
 			res.send("POST - login 성공!");
 		} else {
-			// password did not match
+			// password did not match (유저 아이디는 있지만 비밀번호가 다름)
 			res.status(403).send("잘못된 비밀번호 입니다.");
 			return;
 		}
 	} catch (err) {
 		// internal failure
 		res.send("Login Error: ", err);
+		// res.status(403).send("Login Error", err);
 	}
 });
 
