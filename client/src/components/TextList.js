@@ -1,23 +1,18 @@
 import React from "react";
+import TextItem from "./TextItem";
 import { ListGroup } from "react-bootstrap";
-import TextItem from "./Text";
 
-function TextList() {
-	// fetch("http://localhost:3000", {
-	// 	method: "GET",
-	// 	headers: { "Content-Type": "application/json" },
-	// });
-
-	const text_data = [
-		{ id: 1, text: "text11" },
-		{ id: 2, text: "text 2 2" },
-		{ id: 3, text: "33 text 33" },
-	];
-
+function TextList({ textData, setTextData }) {
 	return (
-		<ListGroup as="ol" numbered className="p-2">
-			{text_data.map((data) => (
-				<TextItem key={data.id} itemId={data.id} itemText={data.text} />
+		<ListGroup as="ol">
+			{textData.map((data, idx) => (
+				<TextItem
+					key={idx}
+					itemIdx={idx}
+					itemId={data.text_id}
+					itemText={data.text_data}
+					setTextData={setTextData}
+				/>
 			))}
 		</ListGroup>
 	);
