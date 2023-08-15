@@ -45,8 +45,19 @@ app.get("/api/text/:text_id", async function (req, res) {
 	);
 	if (rows[0]) {
 		res.send(rows[0]);
-	} else {
-		res.send("조회된 결과가 없습니다.");
+	}
+});
+
+// GET - 데이터베이스(texts)에서 데이터 검색
+app.get("/api/text/search/:text_data", async function (req, res) {
+	const text_data = req.params.text_data;
+	// mysql의 데이터베이스(texts)에서 원하는 데이터 조회
+	const [rows, fields] = await connection.execute(
+		"SELECT * FROM texts WHERE LOCATE(?, text_data) > 0",
+		[text_data]
+	);
+	if (rows) {
+		res.send(rows);
 	}
 });
 

@@ -7,54 +7,66 @@ const TEXT_SERVER_HEADERS = {
 
 /*** fetch로 서버에서 데이터 가져오기 ***/
 // GET - text 전체 조회
-// const getTextData = async (setTextData) => {
-// 	const response = await fetch(textUrl, {
-// 		method: "GET",
-// 		headers: textHeaders,
-// 	});
-// 	const jsonData = await response.json();
-// 	setTextData(jsonData);
-// };
+const getTextData = async (setData) => {
+	const response = await fetch(TEXT_SERVER_URL, {
+		method: "GET",
+		headers: TEXT_SERVER_HEADERS,
+	});
+	const jsonData = await response.json();
+	setData(jsonData);
+};
+
+// GET - text 데이터 검색
+const getSearchedTextData = async (searchData, setData) => {
+	const response = await fetch(TEXT_SERVER_URL + `/search/${searchData}`, {
+		method: "GET",
+		headers: TEXT_SERVER_HEADERS,
+	});
+	const jsonData = await response.json();
+	setData(jsonData);
+
+	if (jsonData.length === 0) {
+		return "empty";
+	}
+};
 
 // POST - text 데이터 추가
-// const postTextData = async (text) => {
-// 	const response = await fetch(TEXT_SERVER_URL, {
-// 		method: "POST",
-// 		headers: TEXT_SERVER_HEADERS,
-// 		body: JSON.stringify({
-// 			text_data: text,
-// 		}),
-// 	});
-// 	return response.json();
-// };
+const postTextData = async (text) => {
+	await fetch(TEXT_SERVER_URL, {
+		method: "POST",
+		headers: TEXT_SERVER_HEADERS,
+		body: JSON.stringify({
+			text_data: text,
+		}),
+	});
+};
 
 // PUT - text 데이터 수정
-// const putTextData = async (id, text) => {
-// 	const response = await fetch(TEXT_SERVER_URL, {
-// 		method: "PUT",
-// 		headers: TEXT_SERVER_HEADERS,
-// 		body: JSON.stringify({
-// 			text_id: id,
-// 			text_data: text,
-// 		}),
-// 	});
-// 	return response.json();
-// };
+const putTextData = async (id, text) => {
+	await fetch(TEXT_SERVER_URL, {
+		method: "PUT",
+		headers: TEXT_SERVER_HEADERS,
+		body: JSON.stringify({
+			text_id: id,
+			text_data: text,
+		}),
+	});
+};
 
 // DELETE - text 데이터 삭제
-// const deleteTextData = async (id) => {
-// 	const response = await fetch(TEXT_SERVER_URL + `/${id}`, {
-// 		method: "DELETE",
-// 		headers: TEXT_SERVER_HEADERS,
-// 	});
-// 	return response.json();
-// };
+const deleteTextData = async (id) => {
+	await fetch(TEXT_SERVER_URL + `/${id}`, {
+		method: "DELETE",
+		headers: TEXT_SERVER_HEADERS,
+	});
+};
 
 /*** axios로 서버에서 데이터 가져오기 ***/
+/*
 // GET - text 전체 조회
-const getTextData = async (setTextData) => {
+const getTextData = async (setData) => {
 	const response = await axios.get(TEXT_SERVER_URL);
-	setTextData(response.data);
+	setData(response.data);
 };
 
 // POST - text 데이터 추가
@@ -76,5 +88,12 @@ const putTextData = async (id, text) => {
 const deleteTextData = async (id) => {
 	await axios.delete(TEXT_SERVER_URL + `/${id}`);
 };
+*/
 
-export { getTextData, postTextData, putTextData, deleteTextData };
+export {
+	getTextData,
+	getSearchedTextData,
+	postTextData,
+	putTextData,
+	deleteTextData,
+};

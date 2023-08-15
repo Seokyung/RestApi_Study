@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { getTextData, putTextData } from "../../api/TextApi";
+
 import { InputGroup, Form, Button } from "react-bootstrap";
-import { getTextData, putTextData } from "../api/TextApi";
 
 function EditText({ itemId, itemText, setTextData, onEditClick }) {
 	const [editText, setEditText] = useState(itemText);

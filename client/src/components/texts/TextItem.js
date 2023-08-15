@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import EditText from "./EditText";
+import { deleteTextData, getTextData } from "../../api/TextApi";
 
 import { ListGroup, Badge, Button } from "react-bootstrap";
-import { deleteTextData, getTextData } from "../api/TextApi";
 
-function TextItem({ itemIdx, itemId, itemText, setTextData }) {
+function TextItem({ itemIdx, itemId, itemText, textType, setTextData }) {
 	const [isEdit, setIsEdit] = useState(false);
 
 	const onEditClick = () => {
@@ -29,7 +29,9 @@ function TextItem({ itemIdx, itemId, itemText, setTextData }) {
 	return (
 		<ListGroup.Item
 			as="li"
-			variant="secondary"
+			variant={textType === "all" ? "secondary" : "info"}
+			action
+			href={`#${itemId}`}
 			className="d-flex justify-content-between align-items-center"
 		>
 			{isEdit ? (
@@ -42,24 +44,31 @@ function TextItem({ itemIdx, itemId, itemText, setTextData }) {
 			) : (
 				<>
 					<h5 style={{ margin: "0" }}>
-						<Badge bg="light" text="dark">
+						<Badge
+							bg={textType === "all" ? "light" : "secondary"}
+							text={textType === "all" ? "dark" : "light"}
+						>
 							{itemIdx + 1}
 						</Badge>
 					</h5>
 					<div className="ms-2 me-auto">
 						<div className="fw-bold">{itemText}</div>
 					</div>
-					<Button variant="secondary" size="sm" onClick={onEditClick}>
-						Edit
-					</Button>
-					<Button
-						variant="danger"
-						size="sm"
-						className="ms-2"
-						onClick={() => onDeleteText(itemId)}
-					>
-						Delete
-					</Button>
+					{textType === "all" && (
+						<>
+							<Button variant="secondary" size="sm" onClick={onEditClick}>
+								Edit
+							</Button>
+							<Button
+								variant="danger"
+								size="sm"
+								className="ms-2"
+								onClick={() => onDeleteText(itemId)}
+							>
+								Delete
+							</Button>
+						</>
+					)}
 				</>
 			)}
 		</ListGroup.Item>

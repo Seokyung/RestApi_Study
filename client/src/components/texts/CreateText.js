@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { getTextData, postTextData } from "../../api/TextApi";
+
 import { InputGroup, Form, Button } from "react-bootstrap";
-import { getTextData, postTextData } from "../api/TextApi";
 
 function CreateText({ setTextData }) {
 	const [text, setText] = useState("");
@@ -12,8 +13,14 @@ function CreateText({ setTextData }) {
 		setText(value);
 	};
 
+	const onPressEnterKey = async (e) => {
+		if (e.key === "Enter") {
+			await e.preventDefault();
+			await onCreateText();
+		}
+	};
+
 	const onCreateText = async (e) => {
-		e.preventDefault();
 		if (text === "") {
 			alert("Write text please");
 			return;
@@ -31,13 +38,14 @@ function CreateText({ setTextData }) {
 	};
 
 	return (
-		<InputGroup>
+		<InputGroup size="lg">
 			<Form.Control
 				type="text"
 				name="text_data"
 				placeholder="Write text here"
 				value={text}
 				onChange={onTextChange}
+				onKeyDown={onPressEnterKey}
 			/>
 			<Button variant="primary" type="submit" onClick={onCreateText}>
 				Submit

@@ -1,0 +1,8 @@
+body {
+	background-color: #deebef;
+	word-break: break-word;
+}
+
+.width-auto {
+	width: auto;
+}
