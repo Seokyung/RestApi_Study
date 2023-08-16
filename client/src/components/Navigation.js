@@ -5,7 +5,13 @@ import { Container, Navbar, Nav } from "react-bootstrap";
 
 function Navigation() {
 	return (
-		<Navbar bg="dark" data-bs-theme="dark">
+		<Navbar
+			expand="md"
+			bg="dark"
+			data-bs-theme="dark"
+			sticky="top"
+			collapseOnSelect
+		>
 			<Container fluid>
 				<Navbar.Brand href="#home">
 					<img
@@ -17,11 +23,13 @@ function Navigation() {
 					/>
 					Text Me 😉
 				</Navbar.Brand>
-				<Nav className="me-auto">
-					<Nav.Link href="#text">MyText</Nav.Link>
-					<Nav.Link href="#profile">Profile</Nav.Link>
-				</Nav>
-				<Navbar.Toggle aria-controls="basic-navbar-nav" />
+				<Navbar.Toggle aria-controls="responsive-navbar-nav" />
+				<Navbar.Collapse id="responsive-navbar-nav">
+					<Nav className="me-auto">
+						<Nav.Link href="#text">MyText</Nav.Link>
+						<Nav.Link href="#profile">Profile</Nav.Link>
+					</Nav>
+				</Navbar.Collapse>
 				<Navbar.Collapse className="justify-content-end" id="basic-navbar-nav">
 					<Navbar.Text>
 						Signed in as: <a href="#profile">Anonymous</a>

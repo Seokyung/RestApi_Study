@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { getSearchedTextData } from "../../api/TextApi";
 
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, InputGroup } from "react-bootstrap";
 
-function SearchText({ searchedTextData, setSearchedTextData }) {
+function SearchBar({ setSearchedTextData }) {
 	const [searchText, setSearchText] = useState("");
 
 	const onTextChange = (e) => {
@@ -37,23 +37,20 @@ function SearchText({ searchedTextData, setSearchedTextData }) {
 	};
 
 	return (
-		<>
-			<Form className="d-flex">
-				<Form.Control
-					type="search"
-					placeholder="Search Texts"
-					className="me-2 width-auto"
-					aria-label="Search"
-					value={searchText}
-					onChange={onTextChange}
-					onKeyDown={onPressEnterKey}
-				/>
-				<Button variant="outline-success" onClick={onSearchText}>
-					Search
-				</Button>
-			</Form>
-		</>
+		<InputGroup className="d-flex justify-content-end">
+			<Form.Control
+				type="search"
+				placeholder="Search Texts"
+				aria-label="Search"
+				value={searchText}
+				onChange={onTextChange}
+				onKeyDown={onPressEnterKey}
+			/>
+			<Button variant="outline-success" onClick={onSearchText}>
+				🔍
+			</Button>
+		</InputGroup>
 	);
 }
 
-export default SearchText;
+export default SearchBar;

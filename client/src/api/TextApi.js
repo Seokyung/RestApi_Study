@@ -1,4 +1,4 @@
-import axios from "axios";
+// import axios from "axios";
 
 const TEXT_SERVER_URL = "http://localhost:4000/api/text";
 const TEXT_SERVER_HEADERS = {
@@ -8,12 +8,16 @@ const TEXT_SERVER_HEADERS = {
 /*** fetch로 서버에서 데이터 가져오기 ***/
 // GET - text 전체 조회
 const getTextData = async (setData) => {
-	const response = await fetch(TEXT_SERVER_URL, {
-		method: "GET",
-		headers: TEXT_SERVER_HEADERS,
-	});
-	const jsonData = await response.json();
-	setData(jsonData);
+	try {
+		const response = await fetch(TEXT_SERVER_URL, {
+			method: "GET",
+			headers: TEXT_SERVER_HEADERS,
+		});
+		const jsonData = await response.json();
+		setData(jsonData);
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 // GET - text 데이터 검색

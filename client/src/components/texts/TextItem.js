@@ -29,9 +29,8 @@ function TextItem({ itemIdx, itemId, itemText, textType, setTextData }) {
 	return (
 		<ListGroup.Item
 			as="li"
-			variant={textType === "all" ? "secondary" : "info"}
+			variant={textType === "all" ? "secondary" : "success"}
 			action
-			href={`#${itemId}`}
 			className="d-flex justify-content-between align-items-center"
 		>
 			{isEdit ? (
@@ -43,7 +42,7 @@ function TextItem({ itemIdx, itemId, itemText, textType, setTextData }) {
 				/>
 			) : (
 				<>
-					<h5 style={{ margin: "0" }}>
+					<h5 className="m-0">
 						<Badge
 							bg={textType === "all" ? "light" : "secondary"}
 							text={textType === "all" ? "dark" : "light"}

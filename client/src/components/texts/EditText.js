@@ -1,17 +1,11 @@
 import React, { useState } from "react";
+import Inputs from "../forms/Inputs";
 import { getTextData, putTextData } from "../../api/TextApi";
 
-import { InputGroup, Form, Button } from "react-bootstrap";
+import { InputGroup, Button } from "react-bootstrap";
 
 function EditText({ itemId, itemText, setTextData, onEditClick }) {
 	const [editText, setEditText] = useState(itemText);
-
-	const onTextChange = (e) => {
-		const {
-			target: { value },
-		} = e;
-		setEditText(value);
-	};
 
 	const onEditText = async () => {
 		if (editText === itemText) {
@@ -33,13 +27,11 @@ function EditText({ itemId, itemText, setTextData, onEditClick }) {
 
 	return (
 		<InputGroup size="sm">
-			<Form.Control
-				type="text"
-				name="text_data"
-				placeholder="Edit Text"
-				autoFocus
-				value={editText}
-				onChange={onTextChange}
+			<Inputs
+				inputValue={editText}
+				setInputValue={setEditText}
+				inputPlaceholder="Edit text"
+				onSubmitInputValue={onEditText}
 			/>
 			<Button variant="secondary" type="submit" onClick={onEditClick}>
 				Cancel
