@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import Inputs from "../forms/Inputs";
+import { useSelector } from "react-redux";
 import { getTextData, postTextData } from "../../api/TextApi";
 
 import { InputGroup, Button } from "react-bootstrap";
 
 function CreateText({ setTextData }) {
-	const [text, setText] = useState("");
+	const userId = useSelector((state) => state.userReducer.user_id);
 
-	const userId = 3;
+	const [text, setText] = useState("");
 
 	const onCreateText = async (e) => {
 		if (text === "") {

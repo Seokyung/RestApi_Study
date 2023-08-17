@@ -1,9 +1,9 @@
 import React from "react";
-import logo from "../img/js_icon.png";
-
-import { Container, Navbar, Nav } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+import { Container, Navbar, Nav } from "react-bootstrap";
+import logo from "../img/js_icon.png";
 
 function Navigation({ isLoggedIn }) {
 	const userName = useSelector((state) => state.userReducer.user_name);

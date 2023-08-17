@@ -5,7 +5,6 @@ const USER_SERVER_HEADERS = {
 
 // GET - 로그인한 user인지 확인
 const getUserValidate = async (setIsLoggedIn) => {
-	console.log("user validating...");
 	const jwtToken = localStorage.getItem("jwtToken");
 	try {
 		const response = await fetch(USER_SERVER_URL + "/validate", {
@@ -17,11 +16,10 @@ const getUserValidate = async (setIsLoggedIn) => {
 		const jsonData = await response.json();
 		if (!jsonData) {
 			setIsLoggedIn(false);
-			console.log("validation failed!");
+			console.log("Login failed!");
 			return;
 		} else {
 			setIsLoggedIn(true);
-			console.log("validation completed!");
 			return jsonData;
 		}
 	} catch (err) {

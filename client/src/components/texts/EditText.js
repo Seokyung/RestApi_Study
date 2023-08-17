@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import Inputs from "../forms/Inputs";
+import { useSelector } from "react-redux";
 import { getTextData, putTextData } from "../../api/TextApi";
 
 import { InputGroup, Button } from "react-bootstrap";
 
 function EditText({ itemId, itemText, setTextData, onEditClick }) {
-	const [editText, setEditText] = useState(itemText);
+	const userId = useSelector((state) => state.userReducer.user_id);
 
-	const userId = 3;
+	const [editText, setEditText] = useState(itemText);
 
 	const onEditText = async () => {
 		if (editText === itemText) {

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import EditText from "./EditText";
+import { useSelector } from "react-redux";
 import { deleteTextData, getTextData } from "../../api/TextApi";
 
 import { ListGroup, Badge, Button } from "react-bootstrap";
 
 function TextItem({ itemIdx, itemId, itemText, textType, setTextData }) {
-	const [isEdit, setIsEdit] = useState(false);
+	const userId = useSelector((state) => state.userReducer.user_id);
 
-	const userId = 3;
+	const [isEdit, setIsEdit] = useState(false);
 
 	const onEditClick = () => {
 		setIsEdit((prev) => !prev);

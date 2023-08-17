@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import CreateText from "../components/texts/CreateText";
 import SearchBar from "../components/search/SearchBar";
+import SearchText from "../components/search/SearchText";
 import TextList from "../components/texts/TextList";
+import { useSelector } from "react-redux";
 import { getTextData } from "../api/TextApi";
 
 import { Container, Row, Col } from "react-bootstrap";
 import randomUnicodeEmoji from "random-unicode-emoji";
-import SearchText from "../components/search/SearchText";
 
 function TextPage() {
+	const userId = useSelector((state) => state.userReducer.user_id);
+
 	const [textData, setTextData] = useState([]);
 	const [searchedTextData, setSearchedTextData] = useState([]);
-
-	const userId = 3;
 
 	useEffect(() => {
 		getTextData(userId, setTextData);

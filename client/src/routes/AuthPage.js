@@ -19,6 +19,7 @@ function AuthPage({ authHandler }) {
 		}
 
 		try {
+			console.log("Getting Logged In...");
 			await postUserLogin(userId, userPW);
 			await authHandler();
 			navigate("/", { replace: true });

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { getSearchedTextData } from "../../api/TextApi";
 
 import { Form, Button, InputGroup } from "react-bootstrap";
 
 function SearchBar({ setSearchedTextData }) {
+	const userId = useSelector((state) => state.userReducer.user_id);
+
 	const [searchText, setSearchText] = useState("");
-	const userId = 3;
 
 	const onTextChange = (e) => {
 		const {
