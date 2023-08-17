@@ -7,9 +7,23 @@ const TEXT_SERVER_HEADERS = {
 
 /*** fetch로 서버에서 데이터 가져오기 ***/
 // GET - text 전체 조회
-const getTextData = async (setData) => {
+// const getTextData = async (setData) => {
+// 	try {
+// 		const response = await fetch(TEXT_SERVER_URL, {
+// 			method: "GET",
+// 			headers: TEXT_SERVER_HEADERS,
+// 		});
+// 		const jsonData = await response.json();
+// 		setData(jsonData);
+// 	} catch (err) {
+// 		console.log(err);
+// 	}
+// };
+
+// GET - user의 text 전체 조회
+const getTextData = async (userId, setData) => {
 	try {
-		const response = await fetch(TEXT_SERVER_URL, {
+		const response = await fetch(TEXT_SERVER_URL + `/${userId}`, {
 			method: "GET",
 			headers: TEXT_SERVER_HEADERS,
 		});
@@ -21,11 +35,14 @@ const getTextData = async (setData) => {
 };
 
 // GET - text 데이터 검색
-const getSearchedTextData = async (searchData, setData) => {
-	const response = await fetch(TEXT_SERVER_URL + `/search/${searchData}`, {
-		method: "GET",
-		headers: TEXT_SERVER_HEADERS,
-	});
+const getSearchedTextData = async (searchData, userId, setData) => {
+	const response = await fetch(
+		TEXT_SERVER_URL + `/search/${searchData}/${userId}`,
+		{
+			method: "GET",
+			headers: TEXT_SERVER_HEADERS,
+		}
+	);
 	const jsonData = await response.json();
 	setData(jsonData);
 
@@ -35,12 +52,13 @@ const getSearchedTextData = async (searchData, setData) => {
 };
 
 // POST - text 데이터 추가
-const postTextData = async (text) => {
+const postTextData = async (text, userId) => {
 	await fetch(TEXT_SERVER_URL, {
 		method: "POST",
 		headers: TEXT_SERVER_HEADERS,
 		body: JSON.stringify({
 			text_data: text,
+			user_id: userId,
 		}),
 	});
 };

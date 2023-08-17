@@ -7,6 +7,8 @@ import { ListGroup, Badge, Button } from "react-bootstrap";
 function TextItem({ itemIdx, itemId, itemText, textType, setTextData }) {
 	const [isEdit, setIsEdit] = useState(false);
 
+	const userId = 3;
+
 	const onEditClick = () => {
 		setIsEdit((prev) => !prev);
 	};
@@ -16,7 +18,7 @@ function TextItem({ itemIdx, itemId, itemText, textType, setTextData }) {
 		if (isDelete) {
 			try {
 				await deleteTextData(id);
-				await getTextData(setTextData);
+				await getTextData(userId, setTextData);
 				alert("text deleted!");
 			} catch (err) {
 				console.log(err);

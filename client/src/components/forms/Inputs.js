@@ -5,6 +5,7 @@ import { Form } from "react-bootstrap";
 function Inputs({
 	inputValue,
 	setInputValue,
+	inputType,
 	inputPlaceholder,
 	onSubmitInputValue,
 }) {
@@ -18,7 +19,9 @@ function Inputs({
 	const onPressEnterKey = async (e) => {
 		if (e.key === "Enter") {
 			await e.preventDefault();
-			await onSubmitInputValue();
+			if (inputType !== "auth") {
+				await onSubmitInputValue();
+			}
 		}
 	};
 

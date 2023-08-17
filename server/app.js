@@ -4,12 +4,17 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import mysql from "mysql2/promise";
 import cors from "cors";
-
 import { userValidator } from "../middleware/auth.js";
 
 const app = express();
+const secretKey = "secure";
 
-app.use(cors());
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+		credentials: true,
+	})
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -29,32 +34,30 @@ app.get("/", function (req, res) {
 });
 
 // GET - 데이터베이스(texts) 전체 조회
-app.get("/api/text", async function (req, res) {
-	// mysql의 데이터베이스(texts)의 데이터 조회 (연결된 database의 데이터 받아옴)
-	const [rows, fields] = await connection.execute("SELECT * FROM texts");
+// app.get("/api/text", async function (req, res) {
+// 	// mysql의 데이터베이스(texts)의 데이터 조회 (연결된 database의 데이터 받아옴)
+// 	const [rows, fields] = await connection.execute("SELECT * FROM texts");
+// 	res.send(rows);
+// });
+
+// GET - 데이터베이스(texts)에서 user의 데이터 전체 조회
+app.get("/api/text/:user_id", async function (req, res) {
+	const user_id = req.params.user_id;
+	// mysql의 데이터베이스(texts)에서 원하는 데이터 조회
+	const [rows, fields] = await connection.execute(
+		"SELECT text_id, text_data FROM texts WHERE user_id=?",
+		[user_id]
+	);
 	res.send(rows);
 });
 
-// GET - 데이터베이스(texts)에서 원하는 값 조회
-app.get("/api/text/:text_id", async function (req, res) {
-	const text_id = req.params.text_id;
-	// mysql의 데이터베이스(texts)에서 원하는 데이터 조회
-	const [rows, fields] = await connection.execute(
-		"SELECT * FROM texts WHERE text_id=?",
-		[text_id]
-	);
-	if (rows[0]) {
-		res.send(rows[0]);
-	}
-});
-
 // GET - 데이터베이스(texts)에서 데이터 검색
-app.get("/api/text/search/:text_data", async function (req, res) {
-	const text_data = req.params.text_data;
+app.get("/api/text/search/:text_data/:user_id", async function (req, res) {
+	const { text_data, user_id } = req.params;
 	// mysql의 데이터베이스(texts)에서 원하는 데이터 조회
 	const [rows, fields] = await connection.execute(
-		"SELECT * FROM texts WHERE LOCATE(?, text_data) > 0",
-		[text_data]
+		"SELECT text_id, text_data FROM texts WHERE LOCATE(?, text_data) > 0 AND user_id=?",
+		[text_data, user_id]
 	);
 	if (rows) {
 		res.send(rows);
@@ -63,11 +66,11 @@ app.get("/api/text/search/:text_data", async function (req, res) {
 
 // POST - 데이터베이스(texts)에 값 추가 (생성)
 app.post("/api/text", async function (req, res) {
-	const { text_data } = req.body;
+	const { text_data, user_id } = req.body;
 	// mysql의 데이터베이스(texts)에 데이터 추가
 	const [rows, fields] = await connection.execute(
-		`INSERT INTO texts(text_data) VALUES(?)`,
-		[text_data] // sql injection 공격을 피하기 위해 인자를 직접 sql문에 쓰지 않음
+		`INSERT INTO texts(text_data, user_id) VALUES(?, ?)`,
+		[text_data, user_id] // sql injection 공격을 피하기 위해 인자를 직접 sql문에 쓰지 않음
 	);
 	res.send(rows);
 });
@@ -97,19 +100,52 @@ app.delete("/api/text/:text_id", async function (req, res) {
 /*** user 인증 ***/
 
 // GET - users 전체 조회
-app.get("/api/users", async (req, res) => {
+app.get("/api/user", async (req, res) => {
 	// mysql의 데이터베이스(users)의 유저 조회
 	const [rows, fields] = await connection.execute("SELECT * FROM users");
 	res.send(rows);
 });
 
-// GET - 인증된 user인지 검증 (auth)
-app.get("/api/secure_data", userValidator, (req, res) => {
-	res.send("인증된 사용자입니다.");
+// GET - 인증된 user인지 검증 (auth) (cookie, jwt, middleware 이용)
+// app.get("/api/user/validate", userValidator, async (req, res) => {
+// 	// console.log("Authorized!");
+// 	res.status(200).send("인증된 사용자입니다.");
+// });
+
+// GET - 인증된 user인지 검증 (auth) (localStorage, jwt 이용)
+app.get("/api/user/validate", async (req, res) => {
+	// 로컬 스토리지에서 액세스 토큰 가져오기
+	const access_token = req.headers.authorization.split(" ")[1];
+
+	// 액세스 토큰이 있는지 확인
+	if (access_token) {
+		try {
+			// 액세스 토큰이 유효한지 확인 (토큰에서 유저 아이디 추출)
+			const { user_set_id } = jwt.verify(access_token, secretKey);
+
+			// mysql의 데이터베이스(users)에서 user_set_id(유저 아이디)로 유저 조회
+			const [rows, fields] = await connection.execute(
+				"SELECT * FROM users WHERE user_set_id=?",
+				[user_set_id]
+			);
+
+			// 조회한 유저 아이디가 데이터베이스에 없는 경우
+			if (!rows[0]) {
+				throw "유효한 액세스 토큰이 아닙니다.";
+			}
+
+			// 유저 아이디가 데이터베이스에 있는 경우 (데이터베이스에 있는 유저 && 로그인(인증된) 유저)
+			res.send(rows[0]);
+		} catch (err) {
+			res.status(401);
+		}
+	} else {
+		res.status(401);
+	}
 });
 
 // POST - users에 유저 정보 추가 (signup)
-app.post("/api/signup", async (req, res) => {
+app.post("/api/user/signup", async (req, res) => {
 	const { user_set_id, user_set_pw, user_name, user_age, user_email } =
 		req.body;
 	try {
@@ -127,8 +163,9 @@ app.post("/api/signup", async (req, res) => {
 });
 
 // POST - 유저 로그인 (login)
-app.post("/api/login", async (req, res) => {
+app.post("/api/user/login", async (req, res) => {
 	const { user_set_id, user_set_pw } = req.body;
+
 	// mysql의 데이터베이스(users)에서 req로 받아온 유저 아이디가 있는지 조회
 	const [rows, fields] = await connection.execute(
 		"SELECT * FROM users WHERE user_set_id=?",
@@ -136,26 +173,25 @@ app.post("/api/login", async (req, res) => {
 	);
 
 	try {
+		// id did not match (해당하는 유저 아이디 없는 경우)
 		if (!rows[0]) {
-			// id did not match (해당하는 유저 아이디 없음)
-			res.status(403).send("해당하는 아이디가 존재하지 않습니다.");
+			res.status(403).send();
 			return;
 		}
-
 		if (await argon2.verify(rows[0].user_set_pw, user_set_pw)) {
 			// password match
-			const access_token = jwt.sign({ user_set_id }, "secure");
-			res.cookie("access_token", access_token, { httpOnly: true }); //쿠키를 이용해 클라이언트에 jwt를 넘겨주는 방법
-			res.send("POST - login 성공!");
+			const access_token = jwt.sign({ user_set_id }, secretKey, {
+				expiresIn: "1h",
+			});
+			res.json({ access_token });
 		} else {
 			// password did not match (유저 아이디는 있지만 비밀번호가 다름)
-			res.status(403).send("잘못된 비밀번호 입니다.");
+			res.status(403).send();
 			return;
 		}
 	} catch (err) {
 		// internal failure
 		res.send("Login Error: ", err);
-		// res.status(403).send("Login Error", err);
 	}
 });
 

@@ -5,6 +5,7 @@ import { Form, Button, InputGroup } from "react-bootstrap";
 
 function SearchBar({ setSearchedTextData }) {
 	const [searchText, setSearchText] = useState("");
+	const userId = 3;
 
 	const onTextChange = (e) => {
 		const {
@@ -27,7 +28,11 @@ function SearchBar({ setSearchedTextData }) {
 		}
 
 		try {
-			const res = await getSearchedTextData(searchText, setSearchedTextData);
+			const res = await getSearchedTextData(
+				searchText,
+				userId,
+				setSearchedTextData
+			);
 			if (res === "empty") {
 				alert("No text viewed!");
 			}

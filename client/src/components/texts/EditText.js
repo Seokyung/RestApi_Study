@@ -7,6 +7,8 @@ import { InputGroup, Button } from "react-bootstrap";
 function EditText({ itemId, itemText, setTextData, onEditClick }) {
 	const [editText, setEditText] = useState(itemText);
 
+	const userId = 3;
+
 	const onEditText = async () => {
 		if (editText === itemText) {
 			onEditClick();
@@ -15,7 +17,7 @@ function EditText({ itemId, itemText, setTextData, onEditClick }) {
 
 		try {
 			await putTextData(itemId, editText);
-			await getTextData(setTextData);
+			await getTextData(userId, setTextData);
 			alert("text edited!");
 		} catch (err) {
 			console.log(err);

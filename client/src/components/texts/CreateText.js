@@ -7,6 +7,8 @@ import { InputGroup, Button } from "react-bootstrap";
 function CreateText({ setTextData }) {
 	const [text, setText] = useState("");
 
+	const userId = 3;
+
 	const onCreateText = async (e) => {
 		if (text === "") {
 			alert("Write text please");
@@ -14,8 +16,8 @@ function CreateText({ setTextData }) {
 		}
 
 		try {
-			await postTextData(text);
-			await getTextData(setTextData);
+			await postTextData(text, userId);
+			await getTextData(userId, setTextData);
 			alert(`${text} submitted!`);
 		} catch (err) {
 			console.log(err);
